@@ -29,7 +29,7 @@
 
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
+    document.getElementById('container').appendChild(renderer.domElement);
 
     // OrbitControls ekleme
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -45,6 +45,7 @@
     const vertexShader = `
       uniform float scale;
       uniform float displacement;
+      uniform float time;
       varying vec2 vUv;
 
       void main() {
@@ -63,23 +64,25 @@
       void main() {
         vec2 p = -1.0 + 2.0 * vUv;
         float a = time * 0.5;
-        float d, e, f, g = 1.0 / 40.0 ,h ,i ,r ,q;
+        float d, e, f, g = 1.0 / 40.0, h, i, r, q;
 
-        e = 400.0*(p.x*0.5+0.5);
-        f = 400.0*(p.y*0.5+0.5);
-        i = 200.0 + sin(e*g+a/150.0)*20.0;
-        d = 200.0 + cos(f*g/2.0)*18.0 + cos(e*g)*7.0;
-        r = sqrt(pow(abs(i-e),2.0) + pow(abs(d-f),2.0));
-        q = f/r;
-        e = (r*cos(q))-a/2.0;f=(r*sin(q))-a/2.0;
-        d = sin(e*g)*176.0 + sin(e*g)*164.0 + r;
-        h = ((f+d)+a/2.0)*g;
-        i = ((e+d)+a/2.0)*g;
-        h = 1.0/h;i=1.0/i;
-        if(r>g){
+        e = 400.0 * (p.x * 0.5 + 0.5);
+        f = 400.0 * (p.y * 0.5 + 0.5);
+        i = 200.0 + sin(e * g + a / 150.0) * 20.0;
+        d = 200.0 + cos(f * g / 2.0) * 18.0 + cos(e * g) * 7.0;
+        r = sqrt(pow(abs(i - e), 2.0) + pow(abs(d - f), 2.0));
+        q = f / r;
+        e = (r * cos(q)) - a / 2.0;
+        f = (r * sin(q)) - a / 2.0;
+        d = sin(e * g) * 176.0 + sin(e * g) * 164.0 + r;
+        h = ((f + d) + a / 2.0) * g;
+        i = ((e + d) + a / 2.0) * g;
+        h = 1.0 / h;
+        i = 1.0 / i;
+        if (r > g) {
           gl_FragColor = vec4(mix(color1, color2, vUv.x), 1.0);
-        }else{
-          gl_FragColor = vec4(vec3(h,i,r),1.0);
+        } else {
+          gl_FragColor = vec4(vec3(h, i, r), 1.0);
         }
       }
     `;
@@ -112,8 +115,6 @@
 
     // Animasyon döngüsü
     function animate(timestamp) {
-      requestAnimationFrame(animate);
-
       cube.rotation.x += 0.01;
       cube.rotation.y += 0.01;
 
@@ -123,6 +124,13 @@
     }
 
     renderer.setAnimationLoop(animate); // requestAnimationFrame yerine setAnimationLoop kullanımı
+
+    // Window resize handling
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
   </script>
 </body>
 </html>
